@@ -31,11 +31,14 @@ def get_diffbot_client() -> Optional[OpenAI]:
     return OpenAI(base_url=DIFFBOT_BASE_URL, api_key=api_key)
 
 
-def analyze_with_diffbot(query: str, model: str = DEFAULT_MODEL) -> str:
+def analyze_with_diffbot(query: str, api_key: str = None, model: str = DEFAULT_MODEL) -> str:
     """Send query to Diffbot and return response."""
-    client = get_diffbot_client()
-    if not client:
-        return ERROR_CONFIGURE_TOKEN
+    if api_key:
+        client = OpenAI(base_url=DIFFBOT_BASE_URL, api_key=api_key)
+    else:
+        client = get_diffbot_client()
+        if not client:
+            return ERROR_CONFIGURE_TOKEN
 
     try:
         response = client.chat.completions.create(
@@ -46,6 +49,8 @@ def analyze_with_diffbot(query: str, model: str = DEFAULT_MODEL) -> str:
         return f"Error: {str(e)}"
 
 
-def validate_api_key() -> bool:
-    """Check if API key is configured."""
+def validate_api_key(api_key: str = None) -> bool:
+    """Check if API key is configured and valid."""
+    if api_key:
+        return bool(api_key and api_key.strip())
     return bool(os.getenv(API_TOKEN_ENV_VAR))

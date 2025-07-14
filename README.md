@@ -27,46 +27,34 @@ Transform your data analysis workflow with AI that executes real code and provid
 
 ### Prerequisites
 - Python 3.11+
-- [uv](https://docs.astral.sh/uv/) package manager
+- pip (comes with Python)
 - Diffbot API token ([Get free token](https://app.diffbot.com/get-started))
 
 ### Installation
 
-1. **Install uv (if not already installed)**
-   ```bash
-   # On macOS and Linux
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   
-   # On Windows
-   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-   
-   # Or with pip
-   pip install uv
-   ```
-
-2. **Clone or download this repository**
+1. **Clone or download this repository**
    ```bash
    git clone https://github.com/yourusername/diffbot-analytics.git
    cd diffbot-analytics
    ```
 
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
-   uv sync
+   pip install -r requirements.txt
    ```
 
-4. **Set up environment variables**
+3. **Set up environment variables**
    ```bash
    cp .env.example .env
    # Edit .env and add your DIFFBOT_API_TOKEN
    ```
 
-5. **Run the application**
+4. **Run the application**
    ```bash
-   uv run streamlit run analytics_dashboard.py
+   streamlit run analytics_dashboard.py
    ```
 
-6. **Open your browser** to `http://localhost:8501`
+5. **Open your browser** to `http://localhost:8501`
 
 ## 🌐 Deployment Options
 
@@ -82,36 +70,18 @@ Transform your data analysis workflow with AI that executes real code and provid
 
 Your app will be available at: `https://your-username-diffbot-analytics-main.streamlit.app`
 
-### Option 2: Docker Deployment
-**For self-hosting or production environments**
-
-1. **Build the Docker image**
-   ```bash
-   docker build -t diffbot-analytics .
-   ```
-
-2. **Run with environment variables**
-   ```bash
-   docker run -p 8501:8501 -e DIFFBOT_API_TOKEN=your_token diffbot-analytics
-   ```
-
-3. **Or use Docker Compose**
-   ```bash
-   docker-compose up
-   ```
-
-### Option 3: Local Development
+### Option 2: Local Development
 **For testing and development**
 
 ```bash
 # Install dependencies
-uv sync
+pip install -r requirements.txt
 
 # Set environment variable
 export DIFFBOT_API_TOKEN=your_token_here
 
 # Run locally
-uv run streamlit run analytics_dashboard.py
+streamlit run analytics_dashboard.py
 ```
 
 ## 📊 Usage Examples
@@ -132,36 +102,20 @@ uv run streamlit run analytics_dashboard.py
 5. Export findings
 
 
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file with:
-```env
-DIFFBOT_API_TOKEN=your_diffbot_api_token_here
-```
-
-### Streamlit Configuration
-The app includes custom styling in `.streamlit/config.toml`:
-```toml
-[theme]
-primaryColor = "#FF6B6B"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F0F2F6"
-textColor = "#262730"
-font = "sans serif"
-```
-
 ## 📁 Project Structure
 
 ```
 diffbot-analytics/
 ├── analytics_dashboard.py      # Main Streamlit application
-├── pyproject.toml             # Python project configuration and dependencies
-├── uv.lock                   # Dependency lock file (auto-generated)
+├── config.py                  # Configuration settings
+├── data_utils.py              # Data processing utilities
+├── diffbot_api.py             # Diffbot API integration
+├── session_utils.py           # Session management utilities
+├── ui_components.py           # UI component functions
+├── visualization.py           # Data visualization functions
+├── requirements.txt           # Python dependencies
 ├── .env.example              # Environment variable template
 ├── .gitignore               # Git ignore rules
-├── Dockerfile               # Docker container setup
-├── docker-compose.yml       # Docker Compose configuration
 ├── README.md               # This documentation
 ├── .streamlit/
 │   └── config.toml         # Streamlit theme configuration
@@ -169,55 +123,9 @@ diffbot-analytics/
 │   ├── ab_test_sample.csv  # Sample A/B test data
 │   └── sales_data_sample.csv # Sample sales data
 └── deploy/
-    ├── streamlit_cloud.md  # Streamlit Cloud deployment guide
-    └── docker_deploy.md    # Docker deployment guide
+    └── streamlit_cloud.md  # Streamlit Cloud deployment guide
 ```
 
-## 🔒 Security Best Practices
-
-- **Never commit API keys** to version control
-- **Use environment variables** for sensitive configuration
-- **Enable rate limiting** in production environments
-- **Implement user authentication** for production deployments
-- **Monitor API usage** to prevent quota exhaustion
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**"Diffbot API token not found" error**
-- Ensure your `.env` file contains `DIFFBOT_API_TOKEN=your_token`
-- Check that the token is valid at [app.diffbot.com](https://app.diffbot.com)
-
-**"ModuleNotFoundError" when running**
-- Install dependencies: `uv sync`
-- Ensure you're running with: `uv run streamlit run analytics_dashboard.py`
-
-**Slow API responses**
-- Try the `diffbot-small-xl` model for faster responses
-- Check your internet connection
-- Verify API quota remaining
-
-**CSV upload issues**
-- Ensure file is valid CSV format
-- Check file size (max 200MB)
-- Verify column headers don't contain special characters
-
-## 📈 Performance Tips
-
-1. **Use caching** - The app caches the Diffbot client for better performance
-2. **Choose appropriate models** - Use `diffbot-small-xl` for speed, `diffbot-large` for complex analysis
-3. **Limit data size** - Large datasets may hit API limits; consider sampling
-4. **Monitor usage** - Track API calls in the sidebar
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and test thoroughly
-4. Commit with clear messages: `git commit -m "Add feature description"`
-5. Push to your branch: `git push origin feature-name`
-6. Submit a pull request
 
 ## 📄 License
 
@@ -225,16 +133,9 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ## 🔗 Related Resources
 
-- [Diffbot LLM Documentation](https://docs.diffbot.com/)
-- [Streamlit Documentation](https://docs.streamlit.io/)
+- [Diffy Chat Documentation](https://diffy.chat/)
 - [Original Article: Transparent Calculations and Real-Time Research](https://codecut.ai/conversational-ai-code-execution-data-analysis/)
 - [CodeCut AI Blog](https://codecut.ai/) - More data science tutorials
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/diffbot-analytics/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/diffbot-analytics/discussions)
-- **Email**: your-email@example.com
 
 ---
 

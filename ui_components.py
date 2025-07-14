@@ -6,6 +6,7 @@ application, including page setup, sidebar, and tab components.
 """
 
 import io
+import os
 from datetime import datetime
 from typing import Optional, Tuple
 
@@ -55,7 +56,7 @@ def render_sidebar() -> Tuple[str, str]:
         "🔑 Diffbot API Token",
         type="password",
         help="Enter your Diffbot API token. Get one at https://app.diffbot.com/get-started",
-        value=st.session_state.get("api_key", ""),
+        value=st.session_state.get("api_key", "") or os.getenv(API_TOKEN_ENV_VAR, ""),
     )
     
     # Store API key in session state
