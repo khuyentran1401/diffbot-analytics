@@ -6,7 +6,6 @@ with transparent calculations.
 """
 
 import os
-from datetime import datetime
 from typing import Any, Tuple
 
 import streamlit as st
@@ -24,7 +23,6 @@ from diffbot_api import analyze_with_diffbot, validate_api_key
 from utils import (
     calculate_conversion_rate,
     create_ab_test_visualization,
-    export_results_to_csv,
 )
 
 
@@ -170,22 +168,6 @@ def render_ab_test_tab(api_key: str, model_choice: str) -> None:
                 st.markdown("### 📊 Analysis Results")
                 st.markdown(result)
 
-                # Export button
-                export_data = [
-                    {
-                        "timestamp": datetime.now().isoformat(),
-                        "type": "A/B Test Analysis",
-                        "control_users": control_users,
-                        "control_conversions": control_conversions,
-                        "treatment_users": treatment_users,
-                        "treatment_conversions": treatment_conversions,
-                        "result": result,
-                    }
-                ]
-                filename = f"ab_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-                st.markdown(
-                    export_results_to_csv(export_data, filename), unsafe_allow_html=True
-                )
 
             except Exception as e:
                 st.error(f"Analysis failed: {str(e)}")
@@ -256,19 +238,6 @@ def render_market_research_tab(api_key: str, model_choice: str) -> None:
                 st.markdown("### 📊 Research Results")
                 st.markdown(result)
 
-                # Export button
-                export_data = [
-                    {
-                        "timestamp": datetime.now().isoformat(),
-                        "type": "Market Research",
-                        "query": research_topic,
-                        "result": result,
-                    }
-                ]
-                filename = f"research_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-                st.markdown(
-                    export_results_to_csv(export_data, filename), unsafe_allow_html=True
-                )
 
             except Exception as e:
                 st.error(f"Research failed: {str(e)}")
