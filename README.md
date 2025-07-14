@@ -8,7 +8,7 @@ Transform your data analysis workflow with AI that executes real code and provid
 - Input control and treatment group data
 - Get comprehensive statistical analysis with p-values, confidence intervals
 - View interactive visualizations of conversion rates
-- Export results with transparent JavaScript calculations
+- Get results with transparent JavaScript calculations
 
 ![A/B Test Analyzer](images/ab_test.png)
 
@@ -16,14 +16,9 @@ Transform your data analysis workflow with AI that executes real code and provid
 - Research any topic with current data and proper citations
 - Quick access to common benchmarks (mobile app, e-commerce, SaaS)
 - Get industry statistics with source attribution
-- Export research findings
 
 ![Market Research](images/market_research.png)
 
-
-### 📋 Session Management
-- Export analysis results to CSV format
-- Clear, intuitive interface
 
 ## 🚀 Quick Start
 
@@ -58,10 +53,7 @@ Transform your data analysis workflow with AI that executes real code and provid
 
 5. **Open your browser** to `http://localhost:8501`
 
-## 🌐 Deployment Options
-
-### Option 1: Streamlit Cloud (Recommended)
-**Free hosting with zero configuration**
+## 🌐 Deployment with Streamlit Cloud
 
 1. Fork this repository to your GitHub account
 2. Visit [share.streamlit.io](https://share.streamlit.io)
@@ -71,20 +63,6 @@ Transform your data analysis workflow with AI that executes real code and provid
 6. Deploy with one click!
 
 Your app will be available at: `https://your-username-diffbot-analytics-main.streamlit.app`
-
-### Option 2: Local Development
-**For testing and development**
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variable
-export DIFFBOT_API_TOKEN=your_token_here
-
-# Run locally
-streamlit run analytics_dashboard.py
-```
 
 ## 📊 Usage Examples
 

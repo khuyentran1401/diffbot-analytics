@@ -5,9 +5,11 @@ A Streamlit application for A/B testing analysis and market research
 with transparent calculations.
 """
 
+import os
 from typing import Any, Tuple
 
 import streamlit as st
+from dotenv import load_dotenv
 
 from config import (
     API_TOKEN_ENV_VAR,
@@ -55,7 +57,7 @@ def render_sidebar() -> Tuple[str, str]:
         "🔑 Diffbot API Token",
         type="password",
         help="Enter your Diffbot API token. Get one at https://app.diffbot.com/get-started",
-        value=st.session_state.get("api_key", ""),
+        value=st.session_state.get("api_key", "") or os.getenv(API_TOKEN_ENV_VAR, ""),
     )
 
     # Store API key in session state
@@ -243,6 +245,7 @@ def render_market_research_tab(api_key: str, model_choice: str) -> None:
 # Main Streamlit Application
 def main() -> None:
     """Main Streamlit application function."""
+    load_dotenv()  # Load environment variables from .env file
     setup_page_config()
 
     st.title("🤖 Conversational Analytics Dashboard")
