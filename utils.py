@@ -1,7 +1,7 @@
 """
 Data processing, calculations, and visualization utilities.
 
-Handles data calculations, export functionality, and chart creation 
+Handles data calculations, export functionality, and chart creation
 for the Diffbot Analytics Dashboard.
 """
 

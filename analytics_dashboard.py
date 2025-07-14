@@ -5,7 +5,6 @@ A Streamlit application for A/B testing analysis and market research
 with transparent calculations.
 """
 
-import os
 from typing import Any, Tuple
 
 import streamlit as st
@@ -56,16 +55,16 @@ def render_sidebar() -> Tuple[str, str]:
         "🔑 Diffbot API Token",
         type="password",
         help="Enter your Diffbot API token. Get one at https://app.diffbot.com/get-started",
-        value=st.session_state.get("api_key", "") or os.getenv(API_TOKEN_ENV_VAR, ""),
+        value=st.session_state.get("api_key", ""),
     )
 
     # Store API key in session state
     if api_key:
         st.session_state.api_key = api_key
         if validate_api_key(api_key):
-            st.sidebar.success("✅ API key valid")
+            st.sidebar.success("✅ API key provided")
         else:
-            st.sidebar.error("❌ Invalid API key")
+            st.sidebar.error("❌ API key required")
     else:
         st.sidebar.info(f"💡 Set {API_TOKEN_ENV_VAR} environment variable to auto-fill")
 
@@ -143,17 +142,17 @@ def render_ab_test_tab(api_key: str, model_choice: str) -> None:
         # Prepare analysis prompt
         prompt = f"""
         Analyze this A/B test with the following data:
-        
+
         Control Group:
         - Users: {control_users}
         - Conversions: {control_conversions}
         - Conversion Rate: {control_rate:.2f}%
-        
+
         Treatment Group:
         - Users: {treatment_users}
         - Conversions: {treatment_conversions}
         - Conversion Rate: {treatment_rate:.2f}%
-        
+
         Please provide:
         1. Statistical significance test with p-value
         2. Confidence intervals for both groups
@@ -167,7 +166,6 @@ def render_ab_test_tab(api_key: str, model_choice: str) -> None:
                 result = analyze_with_diffbot(prompt, api_key, model_choice)
                 st.markdown("### 📊 Analysis Results")
                 st.markdown(result)
-
 
             except Exception as e:
                 st.error(f"Analysis failed: {str(e)}")
@@ -223,7 +221,7 @@ def render_market_research_tab(api_key: str, model_choice: str) -> None:
 
         research_query = f"""
         Research this topic thoroughly and provide current, accurate information: {research_topic}
-        
+
         Please include:
         1. Current statistics and benchmarks
         2. Industry trends and insights
@@ -237,7 +235,6 @@ def render_market_research_tab(api_key: str, model_choice: str) -> None:
                 result = analyze_with_diffbot(research_query, api_key, model_choice)
                 st.markdown("### 📊 Research Results")
                 st.markdown(result)
-
 
             except Exception as e:
                 st.error(f"Research failed: {str(e)}")
@@ -272,7 +269,7 @@ def main() -> None:
     st.markdown(
         """
         <div style='text-align: center; color: gray;'>
-        Built with ❤️ using Streamlit and Diffbot LLM | 
+        Built with ❤️ using Streamlit and Diffbot LLM |
         <a href='https://github.com/yourusername/diffbot-analytics' target='_blank'>View Source</a> |
         <a href='https://app.diffbot.com/get-started' target='_blank'>Get Diffbot API Key</a>
         </div>
