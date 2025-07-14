@@ -214,27 +214,41 @@ def main():
         st.header("🔍 Real-time Market Research")
         st.markdown("Get current market data, trends, and benchmarks with proper source citations.")
         
+        # Initialize session state for research topic
+        if "research_topic" not in st.session_state:
+            st.session_state.research_topic = ""
+        
         research_topic = st.text_input(
             "🎯 What would you like to research?", 
-            placeholder="e.g., e-commerce conversion rate benchmarks 2024, SaaS pricing trends, mobile app retention rates",
+            value=st.session_state.research_topic,
+            placeholder="Click an example below or type your own research question...",
             help="Be specific for better results. Include year, industry, or metric type."
         )
         
-        # Research categories for quick selection
-        st.markdown("**Quick Research Topics:**")
-        col1, col2, col3 = st.columns(3)
+        # Update session state when user types
+        st.session_state.research_topic = research_topic
+        
+        # Example prompts for quick selection
+        st.markdown("**Try these example research prompts:**")
+        col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📱 Mobile App Benchmarks"):
-                research_topic = "mobile app conversion rates and user retention benchmarks 2024"
+            if st.button("📱 Mobile App Retention by Industry", use_container_width=True):
+                st.session_state.research_topic = "What are mobile app retention rates by industry in 2024? Include fintech, gaming, and e-commerce benchmarks with day 1, day 7, and day 30 retention rates."
+                st.rerun()
+            
+            if st.button("🛒 E-commerce Conversion Benchmarks", use_container_width=True):
+                st.session_state.research_topic = "E-commerce conversion rate benchmarks by device type and industry for 2024. Include average order values and cart abandonment rates."
+                st.rerun()
         
         with col2:
-            if st.button("🛒 E-commerce Metrics"):
-                research_topic = "e-commerce conversion rates by industry 2024"
-        
-        with col3:
-            if st.button("💰 SaaS Pricing Trends"):
-                research_topic = "SaaS pricing models and conversion benchmarks 2024"
+            if st.button("💰 SaaS Pricing & Conversion Trends", use_container_width=True):
+                st.session_state.research_topic = "Current SaaS pricing trends for B2B software in 2024. Include average price per seat, conversion rates by company size, and freemium vs paid model performance."
+                st.rerun()
+                
+            if st.button("📧 Email Marketing Benchmarks", use_container_width=True):
+                st.session_state.research_topic = "Email marketing benchmarks 2024: open rates, click rates, and conversion rates by industry. Include data for B2B vs B2C and mobile vs desktop performance."
+                st.rerun()
         
         if st.button("🔍 Research Topic", type="primary"):
             if not research_topic:
