@@ -1,6 +1,6 @@
 # 🤖 Diffbot Conversational Analytics Dashboard
 
-Transform your data analysis workflow with AI that executes real code and provides transparent calculations. This Streamlit application demonstrates how to build conversational analytics using [Diffbot LLM](https://diffy.chat/) for A/B testing, market research, and custom data analysis.
+Transform your data analysis workflow with AI that executes real code and provides transparent calculations. This Streamlit application demonstrates how to build conversational analytics using [Diffbot LLM](https://diffy.chat/) for A/B testing and market research.
 
 ## ✨ Features
 
@@ -16,11 +16,6 @@ Transform your data analysis workflow with AI that executes real code and provid
 - Get industry statistics with source attribution
 - Export research findings
 
-### 📊 Custom Data Analysis
-- Upload CSV files for conversational analysis
-- Built-in sample datasets for immediate testing
-- Request specific analyses (trends, correlations, predictions)
-- Executable code provided for all calculations
 
 ### 📋 Session Management
 - Track analysis history across your session
@@ -136,12 +131,6 @@ uv run streamlit run analytics_dashboard.py
 4. Get current industry data with citations
 5. Export findings
 
-### Custom Data Analysis
-1. Switch to "Custom Analysis" tab
-2. Upload your CSV file or use sample data
-3. Describe your analysis needs
-4. Get insights with executable code
-5. Export comprehensive results
 
 ## 🔧 Configuration
 
