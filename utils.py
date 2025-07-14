@@ -1,12 +1,28 @@
 """
-Visualization and chart creation functions.
+Data processing, calculations, and visualization utilities.
 
-Handles creation of interactive charts and plots for data analysis results.
+Handles data calculations, export functionality, and chart creation 
+for the Diffbot Analytics Dashboard.
 """
 
+import base64
+from typing import Any, Dict, List
+
+import pandas as pd
 import plotly.graph_objects as go
 
-from data_utils import calculate_conversion_rate
+
+def calculate_conversion_rate(conversions: int, users: int) -> float:
+    """Calculate conversion rate as percentage."""
+    return (conversions / users) * 100 if users > 0 else 0.0
+
+
+def export_results_to_csv(data: List[Dict[str, Any]], filename: str) -> str:
+    """Export analysis results to CSV format."""
+    df = pd.DataFrame(data)
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="{filename}">📄 Download CSV Report</a>'
 
 
 def create_ab_test_visualization(

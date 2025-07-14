@@ -10,17 +10,19 @@ Transform your data analysis workflow with AI that executes real code and provid
 - View interactive visualizations of conversion rates
 - Export results with transparent JavaScript calculations
 
+![A/B Test Analyzer](images/ab_test.png)
+
 ### 🔍 Real-time Market Research  
 - Research any topic with current data and proper citations
 - Quick access to common benchmarks (mobile app, e-commerce, SaaS)
 - Get industry statistics with source attribution
 - Export research findings
 
+![Market Research](images/market_research.png)
+
 
 ### 📋 Session Management
-- Track analysis history across your session
-- Export all results to CSV format
-- API usage monitoring
+- Export analysis results to CSV format
 - Clear, intuitive interface
 
 ## 🚀 Quick Start
@@ -106,19 +108,19 @@ streamlit run analytics_dashboard.py
 
 ```
 diffbot-analytics/
-├── analytics_dashboard.py      # Main Streamlit application
+├── analytics_dashboard.py      # Main Streamlit application with UI components
 ├── config.py                  # Configuration settings
-├── data_utils.py              # Data processing utilities
 ├── diffbot_api.py             # Diffbot API integration
-├── session_utils.py           # Session management utilities
-├── ui_components.py           # UI component functions
-├── visualization.py           # Data visualization functions
+├── utils.py                   # Data processing and visualization utilities
 ├── requirements.txt           # Python dependencies
 ├── .env.example              # Environment variable template
 ├── .gitignore               # Git ignore rules
 ├── README.md               # This documentation
 ├── .streamlit/
 │   └── config.toml         # Streamlit theme configuration
+├── images/
+│   ├── ab_test.png         # A/B test interface screenshot
+│   └── market_research.png # Market research interface screenshot
 ├── sample_data/
 │   ├── ab_test_sample.csv  # Sample A/B test data
 │   └── sales_data_sample.csv # Sample sales data

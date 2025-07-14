@@ -1,158 +1,277 @@
 """
 Conversational Analytics Dashboard using Diffbot LLM.
 
-A Streamlit application for A/B testing analysis, market research,
+A Streamlit application for A/B testing analysis and market research
 with transparent calculations.
-
-This file serves as both the main Streamlit app and provides
-programmatic access to core analysis functions.
 """
 
-from typing import Optional
+import os
+from datetime import datetime
+from typing import Any, Tuple
 
-import pandas as pd
 import streamlit as st
 
-from config import DEFAULT_MODEL
-from data_utils import (
-    calculate_conversion_rate,
-    export_results_to_csv,
+from config import (
+    API_TOKEN_ENV_VAR,
+    DEFAULT_CONTROL_CONVERSIONS,
+    DEFAULT_CONTROL_USERS,
+    DEFAULT_TREATMENT_CONVERSIONS,
+    DEFAULT_TREATMENT_USERS,
+    ERROR_ENTER_TOPIC,
+    RESEARCH_EXAMPLES,
 )
 from diffbot_api import analyze_with_diffbot, validate_api_key
-from ui_components import (
-    render_ab_test_tab,
-    render_history_tab,
-    render_market_research_tab,
-    render_sidebar,
-    setup_page_config,
+from utils import (
+    calculate_conversion_rate,
+    create_ab_test_visualization,
+    export_results_to_csv,
 )
 
 
-# Direct Analysis Functions for Programmatic Use
-def analyze_ab_test(
-    control_users: int,
-    control_conversions: int,
-    treatment_users: int,
-    treatment_conversions: int,
-    api_key: str,
-    model: str = DEFAULT_MODEL,
-) -> str:
-    """
-    Perform A/B test analysis programmatically.
+def initialize_session_state(key: str, default_value: Any) -> None:
+    """Initialize session state variable if not exists."""
+    if key not in st.session_state:
+        st.session_state[key] = default_value
 
-    Args:
-        control_users: Number of users in control group
-        control_conversions: Number of conversions in control group
-        treatment_users: Number of users in treatment group
-        treatment_conversions: Number of conversions in treatment group
-        api_key: Diffbot API key
-        model: Model to use for analysis
+
+def setup_page_config() -> None:
+    """Configure Streamlit page settings."""
+    st.set_page_config(
+        page_title="Diffbot Analytics Dashboard",
+        page_icon="🤖",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+
+
+def render_sidebar() -> Tuple[str, str]:
+    """
+    Render sidebar with API configuration and model selection.
 
     Returns:
-        Analysis result as string
+        Tuple of (api_key, model_choice)
     """
-    control_rate = calculate_conversion_rate(control_conversions, control_users)
-    treatment_rate = calculate_conversion_rate(treatment_conversions, treatment_users)
+    st.sidebar.header("⚙️ Configuration")
 
-    query = f"""
-    Analyze my A/B test results:
-    - Control: {control_users} users with {control_conversions} conversions ({control_rate:.2f}% conversion rate)
-    - Treatment: {treatment_users} users with {treatment_conversions} conversions ({treatment_rate:.2f}% conversion rate)
-    
-    Calculate statistical significance, p-value, confidence intervals, and interpret results.
-    Provide the executable JavaScript code for calculations.
-    """
+    # API Key Configuration
+    api_key = st.sidebar.text_input(
+        "🔑 Diffbot API Token",
+        type="password",
+        help="Enter your Diffbot API token. Get one at https://app.diffbot.com/get-started",
+        value=st.session_state.get("api_key", "") or os.getenv(API_TOKEN_ENV_VAR, ""),
+    )
 
-    return analyze_with_diffbot(query, model)
-
-
-def research_topic(query: str, api_key: str, model: str = DEFAULT_MODEL) -> str:
-    """
-    Perform market research on a topic programmatically.
-
-    Args:
-        query: Research question or topic
-        api_key: Diffbot API key
-        model: Model to use for research
-
-    Returns:
-        Research result as string
-    """
-    research_query = f"""
-    Research current trends and data about: {query}
-    
-    Provide:
-    1. Specific statistics and metrics
-    2. Recent industry data (prefer 2024 data)
-    3. Cite recent, credible sources with URLs
-    4. Compare different industries or segments if relevant
-    5. Identify key trends and patterns
-    """
-
-    return analyze_with_diffbot(research_query, model)
-
-
-
-# Utility Functions
-
-
-def calculate_stats(conversions: int, users: int) -> dict:
-    """
-    Calculate basic conversion statistics.
-
-    Args:
-        conversions: Number of conversions
-        users: Number of users
-
-    Returns:
-        Dictionary with conversion rate and other stats
-    """
-    rate = calculate_conversion_rate(conversions, users)
-    return {
-        "conversion_rate": rate,
-        "conversion_rate_decimal": rate / 100,
-        "conversions": conversions,
-        "users": users,
-        "non_conversions": users - conversions,
-    }
-
-
-def export_to_csv(data: list, filename: str) -> str:
-    """
-    Export data to CSV format.
-
-    Args:
-        data: List of dictionaries to export
-        filename: Name for the CSV file
-
-    Returns:
-        HTML link for download
-    """
-    return export_results_to_csv(data, filename)
-
-
-def setup_dashboard() -> None:
-    """Initialize dashboard with default settings."""
-    setup_page_config()
-
-
-def validate_setup(api_key: Optional[str] = None) -> bool:
-    """
-    Check if dashboard is properly configured.
-
-    Args:
-        api_key: Optional API key to validate
-
-    Returns:
-        True if setup is valid
-    """
+    # Store API key in session state
     if api_key:
-        import os
-        from config import API_TOKEN_ENV_VAR
+        st.session_state.api_key = api_key
+        if validate_api_key(api_key):
+            st.sidebar.success("✅ API key valid")
+        else:
+            st.sidebar.error("❌ Invalid API key")
+    else:
+        st.sidebar.info(f"💡 Set {API_TOKEN_ENV_VAR} environment variable to auto-fill")
 
-        os.environ[API_TOKEN_ENV_VAR] = api_key
+    # Model Selection
+    model_choice = st.sidebar.selectbox(
+        "🤖 Model Selection",
+        ["diffbot-small-xl", "diffbot-medium-xl", "diffbot-large-xl"],
+        help="Choose the AI model for analysis",
+    )
 
-    return validate_api_key()
+    return api_key, model_choice
+
+
+def render_ab_test_tab(api_key: str, model_choice: str) -> None:
+    """Render A/B test analyzer tab."""
+    st.header("📈 A/B Test Analysis")
+    st.markdown(
+        "Compare control and treatment groups with statistical significance testing."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("🎯 Control Group")
+        control_users = st.number_input(
+            "Number of Users",
+            min_value=1,
+            value=DEFAULT_CONTROL_USERS,
+            help="Total users in control group",
+        )
+        control_conversions = st.number_input(
+            "Conversions",
+            min_value=0,
+            max_value=control_users,
+            value=min(DEFAULT_CONTROL_CONVERSIONS, control_users),
+            help="Number of conversions in control group",
+        )
+        control_rate = calculate_conversion_rate(control_conversions, control_users)
+        st.metric("Conversion Rate", f"{control_rate:.2f}%")
+
+    with col2:
+        st.subheader("🧪 Treatment Group")
+        treatment_users = st.number_input(
+            "Number of Users",
+            min_value=1,
+            value=DEFAULT_TREATMENT_USERS,
+            help="Total users in treatment group",
+            key="treatment_users",
+        )
+        treatment_conversions = st.number_input(
+            "Conversions",
+            min_value=0,
+            max_value=treatment_users,
+            value=min(DEFAULT_TREATMENT_CONVERSIONS, treatment_users),
+            help="Number of conversions in treatment group",
+            key="treatment_conversions",
+        )
+        treatment_rate = calculate_conversion_rate(
+            treatment_conversions, treatment_users
+        )
+        st.metric("Conversion Rate", f"{treatment_rate:.2f}%")
+
+    # Analysis Button
+    if st.button("🔍 Analyze A/B Test", type="primary"):
+        if not api_key:
+            st.error("Please configure your Diffbot API token in the sidebar.")
+            return
+
+        # Create visualization
+        fig = create_ab_test_visualization(
+            control_users, control_conversions, treatment_users, treatment_conversions
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Prepare analysis prompt
+        prompt = f"""
+        Analyze this A/B test with the following data:
+        
+        Control Group:
+        - Users: {control_users}
+        - Conversions: {control_conversions}
+        - Conversion Rate: {control_rate:.2f}%
+        
+        Treatment Group:
+        - Users: {treatment_users}
+        - Conversions: {treatment_conversions}
+        - Conversion Rate: {treatment_rate:.2f}%
+        
+        Please provide:
+        1. Statistical significance test with p-value
+        2. Confidence intervals for both groups
+        3. Practical significance and business impact
+        4. Recommendations based on results
+        5. JavaScript code for calculations
+        """
+
+        with st.spinner("🔍 Analyzing A/B test..."):
+            try:
+                result = analyze_with_diffbot(prompt, api_key, model_choice)
+                st.markdown("### 📊 Analysis Results")
+                st.markdown(result)
+
+                # Export button
+                export_data = [
+                    {
+                        "timestamp": datetime.now().isoformat(),
+                        "type": "A/B Test Analysis",
+                        "control_users": control_users,
+                        "control_conversions": control_conversions,
+                        "treatment_users": treatment_users,
+                        "treatment_conversions": treatment_conversions,
+                        "result": result,
+                    }
+                ]
+                filename = f"ab_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                st.markdown(
+                    export_results_to_csv(export_data, filename), unsafe_allow_html=True
+                )
+
+            except Exception as e:
+                st.error(f"Analysis failed: {str(e)}")
+
+
+def render_market_research_tab(api_key: str, model_choice: str) -> None:
+    """Render market research tab."""
+    st.header("🔍 Real-time Market Research")
+    st.markdown(
+        "Get current market data, trends, and benchmarks with proper source citations."
+    )
+
+    initialize_session_state("research_topic", "")
+
+    research_topic = st.text_input(
+        "🎯 What would you like to research?",
+        value=st.session_state.research_topic,
+        placeholder="Click an example below or type your own research question...",
+        help="Be specific for better results. Include year, industry, or metric type.",
+    )
+
+    st.session_state.research_topic = research_topic
+
+    st.markdown("**Try these example research prompts:**")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("📱 Mobile App Retention by Industry", use_container_width=True):
+            st.session_state.research_topic = RESEARCH_EXAMPLES["mobile_retention"]
+            st.rerun()
+
+        if st.button("🛒 E-commerce Conversion Benchmarks", use_container_width=True):
+            st.session_state.research_topic = RESEARCH_EXAMPLES["ecommerce_conversion"]
+            st.rerun()
+
+    with col2:
+        if st.button("💰 SaaS Pricing & Conversion Trends", use_container_width=True):
+            st.session_state.research_topic = RESEARCH_EXAMPLES["saas_pricing"]
+            st.rerun()
+
+        if st.button("📧 Email Marketing Benchmarks", use_container_width=True):
+            st.session_state.research_topic = RESEARCH_EXAMPLES["email_marketing"]
+            st.rerun()
+
+    if st.button("🔍 Research Topic", type="primary"):
+        if not research_topic:
+            st.warning(ERROR_ENTER_TOPIC)
+            return
+
+        if not api_key:
+            st.error("Please configure your Diffbot API token in the sidebar.")
+            return
+
+        research_query = f"""
+        Research this topic thoroughly and provide current, accurate information: {research_topic}
+        
+        Please include:
+        1. Current statistics and benchmarks
+        2. Industry trends and insights
+        3. Source citations for all data
+        4. Actionable recommendations
+        5. Relevant time periods and context
+        """
+
+        with st.spinner("🔍 Researching topic..."):
+            try:
+                result = analyze_with_diffbot(research_query, api_key, model_choice)
+                st.markdown("### 📊 Research Results")
+                st.markdown(result)
+
+                # Export button
+                export_data = [
+                    {
+                        "timestamp": datetime.now().isoformat(),
+                        "type": "Market Research",
+                        "query": research_topic,
+                        "result": result,
+                    }
+                ]
+                filename = f"research_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                st.markdown(
+                    export_results_to_csv(export_data, filename), unsafe_allow_html=True
+                )
+
+            except Exception as e:
+                st.error(f"Research failed: {str(e)}")
 
 
 # Main Streamlit Application
@@ -167,11 +286,10 @@ def main() -> None:
 
     api_key, model_choice = render_sidebar()
 
-    tab1, tab2, tab3 = st.tabs(
+    tab1, tab2 = st.tabs(
         [
             "📈 A/B Test Analyzer",
             "🔍 Market Research",
-            "📋 Analysis History",
         ]
     )
 
@@ -180,9 +298,6 @@ def main() -> None:
 
     with tab2:
         render_market_research_tab(api_key, model_choice)
-
-    with tab3:
-        render_history_tab()
 
     st.divider()
     st.markdown(
