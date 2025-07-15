@@ -8,9 +8,10 @@ with transparent calculations.
 import os
 from typing import Any, Tuple
 
-import hydra
 import streamlit as st
 from dotenv import load_dotenv
+from hydra import compose, initialize
+from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig
 
 from diffbot_api import analyze_with_diffbot, validate_api_key
@@ -229,10 +230,22 @@ def render_market_research_tab(cfg: DictConfig, api_key: str, model_choice: str)
 
 
 # Main Streamlit Application
-@hydra.main(config_path=".", config_name="config", version_base=None)
-def main(cfg: DictConfig) -> None:
+def main() -> None:
 	"""Main Streamlit application function."""
 	load_dotenv()  # Load environment variables from .env file
+
+	# Initialize Hydra configuration
+	try:
+		if GlobalHydra().is_initialized():
+			GlobalHydra.instance().clear()
+		initialize(config_path=".", version_base=None)
+		cfg = compose(config_name="config")
+	except Exception:
+		# If initialization fails, try clearing and reinitializing
+		GlobalHydra.instance().clear()
+		initialize(config_path=".", version_base=None)
+		cfg = compose(config_name="config")
+
 	setup_page_config(cfg)
 
 	st.title("🤖 Conversational Analytics Dashboard")
