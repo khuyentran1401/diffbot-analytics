@@ -10,21 +10,19 @@ from typing import Optional
 
 from openai import OpenAI
 
-from config import (
-	API_TOKEN_ENV_VAR,
-	DEFAULT_MODEL,
-	DIFFBOT_BASE_URL,
-)
-
 
 def analyze_with_diffbot(
-	query: str, api_key: Optional[str] = None, model: str = DEFAULT_MODEL
+	query: str,
+	api_key: Optional[str] = None,
+	model: str = "diffbot-small-xl",
+	base_url: str = "https://llm.diffbot.com/rag/v1",
+	token_env_var: str = "DIFFBOT_API_TOKEN"
 ) -> str:
 	"""Send query to Diffbot and return response."""
 	# Use provided api_key or get from environment
-	effective_api_key = api_key or os.getenv(API_TOKEN_ENV_VAR)
+	effective_api_key = api_key or os.getenv(token_env_var)
 
-	client = OpenAI(base_url=DIFFBOT_BASE_URL, api_key=effective_api_key)
+	client = OpenAI(base_url=base_url, api_key=effective_api_key)
 	response = client.chat.completions.create(
 		model=model, messages=[{"role": "user", "content": query}]
 	)

@@ -1,0 +1,65 @@
+# Configuration for Diffbot Analytics Dashboard
+
+defaults:
+  - _self_
+
+api:
+  default_model: "diffbot-small-xl"
+  base_url: "https://llm.diffbot.com/rag/v1"
+  token_env_var: "DIFFBOT_API_TOKEN"
+  available_models:
+    - "diffbot-small-xl"
+    - "diffbot-small"
+
+app_defaults:
+  control_users: 1000
+  control_conversions: 50
+  treatment_users: 1000
+  treatment_conversions: 65
+
+page:
+  title: "Diffbot Analytics Dashboard"
+  icon: "🤖"
+  layout: "wide"
+  sidebar_state: "expanded"
+
+urls:
+  diffbot_signup: "https://app.diffbot.com/get-started"
+  github_repo: "https://github.com/yourusername/diffbot-analytics"
+
+research_examples:
+  mobile_retention: "What are mobile app retention rates by industry in 2024? Include fintech, gaming, and e-commerce benchmarks with day 1, day 7, and day 30 retention rates."
+  ecommerce_conversion: "E-commerce conversion rate benchmarks by device type and industry for 2024. Include average order values and cart abandonment rates."
+  saas_pricing: "Current SaaS pricing trends for B2B software in 2024. Include average price per seat, conversion rates by company size, and freemium vs paid model performance."
+  email_marketing: "Email marketing benchmarks 2024: open rates, click rates, and conversion rates by industry. Include data for B2B vs B2C and mobile vs desktop performance."
+
+prompts:
+  ab_test: |
+    Analyze this A/B test with the following data:
+
+    Control Group:
+    - Users: {control_users}
+    - Conversions: {control_conversions}
+    - Conversion Rate: {control_rate:.2f}%
+
+    Treatment Group:
+    - Users: {treatment_users}
+    - Conversions: {treatment_conversions}
+    - Conversion Rate: {treatment_rate:.2f}%
+
+    Please provide:
+    1. Statistical significance test with p-value
+    2. Confidence intervals for both groups
+    3. Practical significance and business impact
+    4. Recommendations based on results
+    5. JavaScript code for calculations
+
+  market_research: |
+    Research this topic thoroughly and provide current, accurate information: {research_topic}
+
+    Please include:
+    1. Current statistics and benchmarks
+    2. Industry trends and insights
+    3. Source citations for all data
+    4. Actionable recommendations
+    5. Relevant time periods and context
