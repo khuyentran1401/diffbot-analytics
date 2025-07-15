@@ -2,6 +2,8 @@
 
 Transform your data analysis workflow with AI that executes real code and provides transparent calculations. This Streamlit application demonstrates how to build conversational analytics using [Diffbot LLM](https://diffy.chat/) for A/B testing and market research.
 
+**[Try the live app →](https://diffbot-analytics-efk2d4andktn3zv4ejs4zs.streamlit.app/)**
+
 ## ✨ Features
 
 ### 📈 A/B Test Analyzer
