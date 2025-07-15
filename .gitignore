@@ -80,4 +80,5 @@ uv.lock
 Thumbs.db
 
 # Logs
-*.log
+*.logoutputs/
+outputs/
