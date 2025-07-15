@@ -22,6 +22,10 @@ def analyze_with_diffbot(
 	# Use provided api_key or get from environment
 	effective_api_key = api_key or os.getenv(token_env_var)
 
+	# Check if API key is provided before creating client
+	if not effective_api_key or not effective_api_key.strip():
+		return "❌ API key is required. Please provide your Diffbot API token in the sidebar."
+
 	client = OpenAI(base_url=base_url, api_key=effective_api_key)
 	response = client.chat.completions.create(
 		model=model, messages=[{"role": "user", "content": query}]

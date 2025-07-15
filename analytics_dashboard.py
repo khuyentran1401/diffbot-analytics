@@ -47,11 +47,19 @@ def render_sidebar(cfg: DictConfig) -> Tuple[str, str]:
 	st.sidebar.header("⚙️ Configuration")
 
 	# API Key Configuration
+	try:
+		default_token_env = cfg.api.token_env_var
+		signup_url = cfg.urls.diffbot_signup
+	except Exception:
+		# Fallback if config access fails
+		default_token_env = "DIFFBOT_API_TOKEN"
+		signup_url = "https://app.diffbot.com/get-started"
+
 	api_key = st.sidebar.text_input(
 		"🔑 Diffbot API Token",
 		type="password",
-		help=f"Enter your Diffbot API token. Get one at {cfg.urls.diffbot_signup}",
-		value=st.session_state.get("api_key", "") or os.getenv(cfg.api.token_env_var, ""),
+		help=f"Enter your Diffbot API token. Get one at {signup_url}",
+		value=st.session_state.get("api_key", "") or os.getenv(default_token_env, ""),
 	)
 
 	# Store API key in session state
@@ -62,12 +70,22 @@ def render_sidebar(cfg: DictConfig) -> Tuple[str, str]:
 		else:
 			st.sidebar.error("❌ API key required")
 	else:
-		st.sidebar.info(f"💡 Set {cfg.api.token_env_var} environment variable to auto-fill")
+		try:
+			env_var_name = cfg.api.token_env_var
+		except Exception:
+			env_var_name = "DIFFBOT_API_TOKEN"
+		st.sidebar.info(f"💡 Set {env_var_name} environment variable to auto-fill")
 
 	# Model Selection
+	try:
+		available_models = list(cfg.api.available_models)
+	except Exception:
+		# Fallback models if config access fails
+		available_models = ["diffbot-small-xl", "diffbot-small"]
+
 	model_choice = st.sidebar.selectbox(
 		"🤖 Model Selection",
-		list(cfg.api.available_models),
+		available_models,
 		help="Choose the AI model for analysis",
 	)
 
